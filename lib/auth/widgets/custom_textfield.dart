@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CutomTextField extends StatelessWidget {
-  const CutomTextField({super.key, this.prefixIcon, this.sufixIcon, required this.hintText});
+   CutomTextField({super.key, this.prefixIcon, this.sufixIcon, required this.hintText,this.controller});
   final Widget? prefixIcon;
   final Widget? sufixIcon;
   final String hintText;
+  TextEditingController? controller;
 
 
   @override
@@ -12,6 +13,7 @@ class CutomTextField extends StatelessWidget {
     return  SizedBox(
       width: MediaQuery.of(context).size.width*0.85,
       child: TextField(
+        controller: controller,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.symmetric(horizontal: 30,vertical: 14),
           hintText: hintText,

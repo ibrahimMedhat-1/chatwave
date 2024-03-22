@@ -1,5 +1,8 @@
+import 'package:chatwave/constants.dart';
+import 'package:chatwave/home/manager/home_cubit.dart';
 import 'package:chatwave/home/widgets/find_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../auth/widgets/custom_textfield.dart';
 import '../chat/view/chat_page.dart';
@@ -12,213 +15,250 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        backgroundColor: const Color(0XFF2E4374),
-        appBar: AppBar(
-          backgroundColor: const Color(0XFF2E4374),
-          title: Image.asset("assets/images/home logo.png",height: 50,),
-          bottom: TabBar(
-            overlayColor: const MaterialStatePropertyAll(Color(0xFFC4D7E0)),
+      child: BlocConsumer<HomeCubit, HomeState>(
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        HomeCubit cubit = HomeCubit.get(context);
 
-            indicatorColor: Colors.white,
-            indicatorPadding: const EdgeInsets.symmetric(horizontal: -45),
+        return Scaffold(
+            backgroundColor: const Color(0XFF2E4374),
+            appBar: AppBar(
+              backgroundColor: const Color(0XFF2E4374),
+              title: Image.asset("assets/images/home logo.png",height: 50,),
+              bottom: TabBar(
+                overlayColor: const MaterialStatePropertyAll(Color(0xFFC4D7E0)),
 
-            indicator: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              shape: BoxShape.rectangle,
-                border: Border.all(color: Colors.white,width: 3)),
+                indicatorColor: Colors.white,
+                indicatorPadding: const EdgeInsets.symmetric(horizontal: -45),
 
-            dividerColor: Colors.transparent,
+                indicator: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  shape: BoxShape.rectangle,
+                    border: Border.all(color: Colors.white,width: 3)),
 
-            unselectedLabelColor: Colors.white,
-            labelColor: const Color(0XFF2E4374),
-            tabs: const [
-              Tab(text: 'Chats'),
-              Tab(text: 'Detect'),
-              Tab(text: 'Settings'),
-            ],
-          ),
+                dividerColor: Colors.transparent,
 
-        centerTitle: true,
-        ),
-        body: TabBarView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(50),
-                    topRight: Radius.circular(50)
-                  )
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0,),
-                  child: Column(
-                    children: [
-                      SizedBox(height: MediaQuery.of(context).size.height*0.04,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                unselectedLabelColor: Colors.white,
+                labelColor: const Color(0XFF2E4374),
+                tabs: const [
+                  Tab(text: 'Chats'),
+                  Tab(text: 'Detect'),
+                  Tab(text: 'Settings'),
+                ],
+              ),
+
+            centerTitle: true,
+            ),
+            body: TabBarView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50)
+                      )
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0,),
+                      child: Column(
                         children: [
-                          const Text("Recent Chats",style: TextStyle(color: Color(0XFF2E4374),fontWeight: FontWeight.bold,fontSize: 18),),
-                          IconButton(onPressed: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const FindWidget(),));
-                          }, icon: const Icon(Icons.search_rounded))
+                          SizedBox(height: MediaQuery.of(context).size.height*0.04,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text("Recent Chats",style: TextStyle(color: Color(0XFF2E4374),fontWeight: FontWeight.bold,fontSize: 18),),
+                              IconButton(onPressed: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => const FindWidget(),));
+                              }, icon: const Icon(Icons.search_rounded))
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height*0.7,
+                            child: ListView.builder(
+                              itemCount: cubit.allUsers.length,
+                              itemBuilder: (context, index) {
+                              return ListTile(
+                                onTap: (){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) =>  ChatScreen(userModel: cubit.allUsers[index],),));
+                                },
+                                leading: Image.asset("assets/images/profile.png"),
+                                title:  Text(cubit.allUsers[index].name!),
+                                subtitle: const Text("Messega content"),
+                                trailing: const Text("message date"),
+                              );
+                            },),
+                          )
+
                         ],
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height*0.7,
-                        child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen(),));
-                            },
-                            leading: Image.asset("assets/images/profile.png"),
-                            title: const Text("User Name"),
-                            subtitle: const Text("Messega content"),
-                            trailing: const Text("message date"),
-                          );
-                        },),
-                      )
-
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50)
-                    )
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: MediaQuery.of(context).size.height*0.04,),
-                    Image.asset("assets/images/Yellow and Black Creative Illustration Chit Chat Logo (5).png"),
-                    PrimaryButton(
-                      onTap: (){},
-                      bgColor: const Color(0XFF2E4374),
-                      text: "Upload voice",
-                      textColor: Colors.white,
-                      height: 45,
-                      width: MediaQuery.of(context).size.width*0.55,
-
-                      borderRadius: 30,
-                      fontSize: 16,
-                    ) ,
-                    const SizedBox(height: 25,),
-                    const Text("Uploaded Audio",style: TextStyle(fontSize: 16),),
-                    const SizedBox(height: 25,),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50)
+                        )
+                    ),
+                    child: Column(
                       children: [
-                        Text("This Audio Is Real",style: TextStyle(color: Color(0xFF6E85B7),fontSize: 20,fontWeight: FontWeight.bold),),
-                        Icon(Icons.check,color: Colors.green,)
+                        SizedBox(height: MediaQuery.of(context).size.height*0.04,),
+                        Image.asset("assets/images/Yellow and Black Creative Illustration Chit Chat Logo (5).png"),
+                        PrimaryButton(
+                          onTap: (){},
+                          bgColor: const Color(0XFF2E4374),
+                          text: "Upload voice",
+                          textColor: Colors.white,
+                          height: 45,
+                          width: MediaQuery.of(context).size.width*0.55,
+
+                          borderRadius: 30,
+                          fontSize: 16,
+                        ) ,
+                        const SizedBox(height: 25,),
+                        const Text("Uploaded Audio",style: TextStyle(fontSize: 16),),
+                        const SizedBox(height: 25,),
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("This Audio Is Real",style: TextStyle(color: Color(0xFF6E85B7),fontSize: 20,fontWeight: FontWeight.bold),),
+                            Icon(Icons.check,color: Colors.green,)
+                          ],
+                        ),
+
+
+
+
                       ],
                     ),
-
-
-
-
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50)
-                    )
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(height: MediaQuery.of(context).size.height*0.06,),
-                    const Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 80,
-                          backgroundColor: Color(0xFF6E85B7),
-                          backgroundImage: AssetImage(
-                              "assets/images/profile.png"
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50)
+                        )
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height*0.06,),
+                          const Stack(
+                            children: [
+                              CircleAvatar(
+                                radius: 80,
+                                backgroundColor: Color(0xFF6E85B7),
+                                backgroundImage: AssetImage(
+                                    "assets/images/profile.png"
+                                ),
+                              ),
+                              CircleAvatar(
+                                radius: 22,
+                                backgroundColor: Color(0xFFF8F9D7),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.edit,color: Color(0XFF2E4374),
+                                  ),
+                                ),
+                              ),
+
+
+                            ],
                           ),
-                        ),
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: Color(0xFFF8F9D7),
-                          child: Center(
-                            child: Icon(
-                              Icons.edit,color: Color(0XFF2E4374),
+                          SizedBox(height: MediaQuery.of(context).size.height*0.04,),
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text( userModel!.name.toString(),style: const TextStyle(color:Color(0XFF2E4374),fontSize: 20,fontWeight: FontWeight.bold ),),
+                              const SizedBox(width: 5,),
+                              IconButton(onPressed: (){
+                                cubit.toggleEditing();
+                              }, icon: const Icon(Icons.edit))
+
+                            ],
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height*0.02,),
+                          if (cubit.isEditing)
+                            Column(
+                              children: [
+                                CutomTextField(
+                                  controller: cubit.nameController,
+                                  hintText: userModel!.name.toString(),
+                                ),
+                                const SizedBox(height: 10,),
+                                ElevatedButton(
+                                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0XFF2E4374))),
+                                  onPressed: cubit.saveChanges,
+                                  child: const Text('Save',style: TextStyle(color: Colors.white),),
+                                ),
+                              ],
                             ),
+                          SizedBox(height: MediaQuery.of(context).size.height*0.02,),
+                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(userModel!.phone.toString(),style: const TextStyle(color:Color(0XFF2E4374),fontSize: 20,fontWeight: FontWeight.bold ),),
+                              const SizedBox(width: 5,),
+                              IconButton(onPressed: (){
+                                cubit.toggleEditingPhone();
+                              }, icon:  const Icon(Icons.edit))
+
+                            ],
                           ),
-                        ),
+                          SizedBox(height: MediaQuery.of(context).size.height*0.02,),
+                          if (cubit.isEditingPhone)
+                            Column(
+                              children: [
+                                CutomTextField(
+                                  controller: cubit.phoneController,
+                                  hintText: userModel!.phone.toString(),
+                                ),
+                                const SizedBox(height: 10,),
+                                ElevatedButton(
+                                  style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color(0XFF2E4374))),
+                                  onPressed: cubit.saveChangesPhone,
+                                  child: const Text('Save',style: TextStyle(color: Colors.white),),
+                                ),
+                              ],
+                            ),
 
-
-                      ],
+                          SizedBox(height: MediaQuery.of(context).size.height*0.06,),
+                          PrimaryButton(
+                            onTap: (){},
+                            bgColor: const Color(0XFF2E4374),
+                            text: "Logout",
+                            textColor: Colors.white,
+                            height: 45,
+                            width: MediaQuery.of(context).size.width*0.55,
+                            borderRadius: 30,
+                            fontSize: 16,
+                          ) ,
+                        ],
+                      ),
                     ),
-                    SizedBox(height: MediaQuery.of(context).size.height*0.04,),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Edit Name",style: TextStyle(color:Color(0XFF2E4374),fontSize: 20,fontWeight: FontWeight.bold ),),
-                        SizedBox(width: 5,),
-                        Icon(Icons.edit)
-                      ],
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height*0.02,),
-                    const CutomTextField(
-                      hintText: "Edit Name",
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height*0.02,),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Add Phone Number",style: TextStyle(color:Color(0XFF2E4374),fontSize: 20,fontWeight: FontWeight.bold ),),
-                        SizedBox(width: 5,),
-                        Icon(Icons.edit)
-                      ],
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height*0.02,),
-                    const CutomTextField(
-                      hintText: "Phone Number",
-                    ),
-                    SizedBox(height: MediaQuery.of(context).size.height*0.06,),
-                    PrimaryButton(
-                      onTap: (){},
-                      bgColor: const Color(0XFF2E4374),
-                      text: "Logout",
-                      textColor: Colors.white,
-                      height: 45,
-                      width: MediaQuery.of(context).size.width*0.55,
-
-                      borderRadius: 30,
-                      fontSize: 16,
-                    ) ,
-
-
-
-
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
 
 
 
+          );
+      },
       ),
     );
   }

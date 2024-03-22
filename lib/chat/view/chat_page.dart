@@ -1,7 +1,9 @@
+import 'package:chatwave/models/user_model.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+  const ChatScreen({super.key,required this.userModel});
+  final UserModel userModel;
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +26,14 @@ class ChatScreen extends StatelessWidget {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0XFF2E4374),
-        title: const Row(
+        title:  Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               backgroundColor: Colors.transparent,
               backgroundImage: AssetImage ("assets/images/profile.png"),
             ),
-            SizedBox(width: 10,),
-            Text('User Name',style: TextStyle(color: Colors.white),),
+            const SizedBox(width: 10,),
+            Text(userModel.name.toString(),style: const TextStyle(color: Colors.white),),
           ],
         ),
       ),
