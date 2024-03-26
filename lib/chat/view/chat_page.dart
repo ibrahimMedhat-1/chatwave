@@ -1,176 +1,105 @@
-import 'package:chatwave/models/user_model.dart';
+import 'package:chatwave/chat/manager/chat_cubit.dart';
+import 'package:chatwave/constants.dart';
+import 'package:chatwave/models/chat_user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../models/message_model.dart';
+import '../chat_bubble.dart';
 
 class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key,required this.userModel});
-  final UserModel userModel;
+  const ChatScreen({super.key,required this.userModel2,required this.reciverUserId, required this.reciverName});
+  final ChatUserModel userModel2;
+  final reciverUserId;
+  final reciverName;
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+  create: (context) => ChatCubit()..getMessages(userModel2.id),
+  child: BlocConsumer<ChatCubit, ChatState>(
+  listener: (context, state) {
+    // TODO: implement listener
+  },
+  builder: (context, state) {
+    final ChatCubit cubit = ChatCubit.get(context);
     return Stack(
-
-    children:[
-      Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-
-            fit: BoxFit.fill,
-            image: AssetImage("assets/images/a7829c5e3f4c8ea3810d24a064f6c0a1.jpg")
-          )
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            image: DecorationImage(
+                fit: BoxFit.fill,
+                image: AssetImage('assets/images/a7829c5e3f4c8ea3810d24a064f6c0a1.jpg')),
+          ),
         ),
-      ),
-      Scaffold(
-        backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0XFF2E4374),
-        title:  Row(
-          children: [
-            const CircleAvatar(
-              backgroundColor: Colors.transparent,
-              backgroundImage: AssetImage ("assets/images/profile.png"),
-            ),
-            const SizedBox(width: 10,),
-            Text(userModel.name.toString(),style: const TextStyle(color: Colors.white),),
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              child: Column(
-                children: [
-                  const Spacer(),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                      height: 50,
-                      width: 100,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFF6E85B7),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          )
-                      ),
-                      child: const Center(
-                        child: Text("Message",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white ),),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      height: 50,
-                      width: 120,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFFF8F9D7),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                          )
-                      ),
-                      child: const Center(
-                        child: Text("Message reply",style: TextStyle(fontWeight: FontWeight.bold,color: Color(0XFF2E4374) ),),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                      height: 50,
-                      width: 100,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFF6E85B7),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          )
-                      ),
-                      child: const Center(
-                        child: Text("Message",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white ),),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      height: 50,
-                      width: 120,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFFF8F9D7),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                          )
-                      ),
-                      child: const Center(
-                        child: Text("Message reply",style: TextStyle(fontWeight: FontWeight.bold,color: Color(0XFF2E4374) ),),
-                      ),
-                    ),
-                  ),
-
-
-
-
-                ],
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Text(userModel2.name!),
+            centerTitle: true,
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  reverse: true,
+                  controller: cubit.scrollController,
+                  itemCount: cubit.reversedChatMessage.length,
+                  itemBuilder: (context, index) {
+                    final message = cubit.reversedChatMessage[index];
+                    return ChatBubble(
+                      image: userModel2.image.toString(),
+                      text: message.text!,
+                      isUser: message.senderId == userModel!.id ? true : false,
+                    );
+                  },
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Expanded(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.07,
                   child: TextField(
-
+                    controller: cubit.messageController,
                     decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 30,vertical: 14),
-                      suffixIcon: const Icon( Icons.attach_file,color: Color(0XFF2E4374),),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: const BorderSide(color:  Color(0XFF2E4374))
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(color:  Color(0XFF2E4374)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: const BorderSide(color:  Color(0XFF2E4374)),
-                        ),
                       filled: true,
                       fillColor: Colors.white,
-                      hintText: 'Type a message...',
-                     hintStyle: const TextStyle(color: Colors.grey,fontSize: 14)
-
-
+                      hintText: "Send Message",
+                      hintStyle: Theme.of(context).textTheme.bodyMedium,
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          MessageModel message = MessageModel(
+                            date: DateTime.now().toString(),
+                            text: cubit.messageController.text,
+                            sender: userModel!.name,
+                            receiverId: userModel2.id,
+                            senderId: userModel!.id,
+                          );
+                          cubit.sendMessage(message,userModel2.name!,userModel2.image!,userModel2.id!);
+                          cubit.messageController.clear();
+                        },
+                        icon: const Icon(Icons.send),
+                      ),
+                      border: const OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                          color: Colors.yellow,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10,),
-                CircleAvatar(backgroundColor: const Color(0XFF2E4374),
-                  child: IconButton(
-                    icon: const Icon(Icons.mic,color: Colors.white ,),
-                    onPressed: () {
-                    },
-                  ),
-                ),
-
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-    ]
+              ),
+            ],
+          ),
+        )
+      ],
     );
+  },
+),
+);
   }
 }
 

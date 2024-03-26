@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../auth/widgets/custom_textfield.dart';
+import '../../chat/view/chat_page.dart';
 
 class FindWidget extends StatelessWidget {
   const FindWidget({super.key});
@@ -53,10 +54,39 @@ class FindWidget extends StatelessWidget {
                       child: ListView.builder(
                         itemCount: cubit.allUsers.length,
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            leading: Image.asset("assets/images/profile.png"),
+                          return  ListTile(
+                            onTap: (){
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatScreen(
+                                      reciverName: cubit.allUsers[index].name,
+                                      reciverUserId: cubit.allUsers[index].id,
+                                      userModel2: cubit.allUsers[index],
+                                    ),
+                                  ));
+                            },
+                            leading: cubit.allUsers[index].image! == ''
+                                ? const Material(
+                              elevation: 4,
+                              shape: CircleBorder(),
+                              child: CircleAvatar(
+                                backgroundImage: AssetImage(
+                                    'assets/images/profile.png'),
+                              ),
+                            )
+                                : Material(
+                              elevation: 4,
+                              shape: const CircleBorder(),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.black,
+                                backgroundImage: NetworkImage(cubit
+                                    .allUsers[index].image!
+                                    .toString()),
+                              ),
+                            ),
                             title: Text(cubit.allUsers[index].name!),
-                            subtitle: Text(cubit.allUsers[index].email!),
+
                           );
                         },
                       ),

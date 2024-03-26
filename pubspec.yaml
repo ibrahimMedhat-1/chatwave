@@ -42,8 +42,10 @@ dependencies:
   flutter_bloc:
   firebase_auth:
   cloud_firestore:
+  file_picker:
   image_picker:
   firebase_storage:
+  intl: ^0.19.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
