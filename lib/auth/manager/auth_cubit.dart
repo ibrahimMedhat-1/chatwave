@@ -26,14 +26,16 @@ class AuthCubit extends Cubit<AuthState> {
   bool isLoadingSignUp = false;
 
   Future<void> signup(
-      context, {
-        required UserModel userModel,
-        required String password,
-      }) async {
+    context, {
+    required UserModel userModel,
+    required String password,
+  }) async {
     isLoadingSignUp = true;
     emit(IsLoading());
     String uid;
-    FirebaseAuth.instance.createUserWithEmailAndPassword(email: userModel.email!, password: password).then((value) {
+    FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: userModel.email!, password: password)
+        .then((value) {
       uid = value.user!.uid;
       FirebaseFirestore.instance.collection("users").doc(uid).set(userModel.toMap(id: uid)).then((value) {
         emailSignUpController.clear();
@@ -51,7 +53,6 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
-
   Future<void> login({
     required String email,
     required String password,
@@ -63,21 +64,21 @@ class AuthCubit extends Cubit<AuthState> {
     FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) {
       uid = value.user!.uid;
       FirebaseFirestore.instance.collection("users").doc(uid).get().then((value) async {
-        userModel =  UserModel.fromJson(value.data());
+        userModel = UserModel.fromJson(value.data());
 
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => const  HomePage(),
-            ));
-            isLoading = false;
-            emit(IsLoading());
-          });
-
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+          (route) => false,
+        );
+        isLoading = false;
+        emit(IsLoading());
+      });
     }).catchError((onError) {
       isLoading = false;
       emit(IsLoading());
       Fluttertoast.showToast(msg: onError.message.toString());
     });
   }
-
-
 }
