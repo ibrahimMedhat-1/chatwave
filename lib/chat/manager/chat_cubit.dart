@@ -131,7 +131,11 @@ class ChatCubit extends Cubit<ChatState> {
     debugPrint(printDuration(recordDuration));
 
     final audioFile = File(path!);
-    FirebaseStorage.instance.ref().child('records/records/${DateTime.now()}').putFile(audioFile).then((p0) {
+    FirebaseStorage.instance
+        .ref()
+        .child('records/records/${DateTime.now()}')
+        .putFile(audioFile, SettableMetadata(contentType: 'mp3'))
+        .then((p0) {
       p0.ref.getDownloadURL().then((value) async {
         url = value.toString();
         sendMessage(
