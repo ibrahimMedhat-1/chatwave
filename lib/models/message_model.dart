@@ -4,8 +4,12 @@ class MessageModel {
   String? id;
   String? senderId;
   String? type;
+  String? duration;
   String? text;
   String? sender;
+  String? lastMessage;
+  String? lastMessageDate;
+  String? image;
   bool? isRead;
   bool? isLastMessage;
   MessageModel({
@@ -13,12 +17,22 @@ class MessageModel {
     required this.text,
     required this.sender,
     required this.receiverId,
+    required this.image,
     required this.senderId,
+    required this.type,
+    required this.duration,
+    required this.lastMessage,
+    required this.lastMessageDate,
   });
 
   MessageModel.fromJson(Map<String, dynamic>? json) {
     date = json!['date'];
-    receiverId = json['receiverId'];
+    receiverId = json['id'];
+    image = json['image'];
+    lastMessage = json['lastMessage'];
+    lastMessageDate = json['lastMessageDate'];
+    type = json['type'];
+    duration = json['duration'];
 
     id = json['id'];
     senderId = json['senderId'];
@@ -27,13 +41,16 @@ class MessageModel {
     sender = json['sender'];
   }
 
-  Map<String, dynamic> toMap(id) => {
-    'id': id,
-    'date': date,
-    'receiverId': receiverId,
-    'senderId': senderId,
-    'type': type,
-    'text': text,
-    'sender': sender,
-  };
+  Map<String, dynamic> toMap() => {
+        'date': date,
+        'image': image,
+        'lastMessage': lastMessage,
+        'lastMessageDate': lastMessageDate,
+        'id': receiverId,
+        'senderId': senderId,
+        'type': type,
+        'text': text,
+        'name': sender,
+        'duration': duration,
+      };
 }

@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 
 import '../../constants.dart';
 import '../../models/chat_user_model.dart';
@@ -22,7 +22,7 @@ class HomeCubit extends Cubit<HomeState> {
   bool isEditingPhone = false;
   List<ChatUserModel> users = [];
 
-  List allUsers = [];
+  List<ChatUserModel> allUsers = [];
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
@@ -46,11 +46,7 @@ class HomeCubit extends Cubit<HomeState> {
     FirebaseFirestore.instance.collection('users').doc(userModel!.id).update({
       'phone': phoneController.text,
     }).then((value) async {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userModel!.id)
-          .get()
-          .then((value) {
+      await FirebaseFirestore.instance.collection('users').doc(userModel!.id).get().then((value) {
         userModel = UserModel.fromJson(value.data());
         emit(ChangePhone());
       });
@@ -65,11 +61,7 @@ class HomeCubit extends Cubit<HomeState> {
     FirebaseFirestore.instance.collection('users').doc(userModel!.id).update({
       'name': nameController.text,
     }).then((value) async {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userModel!.id)
-          .get()
-          .then((value) {
+      await FirebaseFirestore.instance.collection('users').doc(userModel!.id).get().then((value) {
         userModel = UserModel.fromJson(value.data());
         emit(ChangeName());
       });
@@ -81,32 +73,36 @@ class HomeCubit extends Cubit<HomeState> {
 
   List<ChatUserModel> privateChatUser = [];
 
-    void getUsersChats() {
+  void getUsersChats() {
     FirebaseFirestore.instance
         .collection('users')
         .doc(userModel!.id)
         .collection('chat')
         .snapshots()
         .listen((value) async {
+      print(value.docs.length);
       privateChatUser.clear();
       for (var element in value.docs) {
         List<MessageModel> messages = [];
-        await element.reference.collection('messages').get().then((value) {
-          for (var element in value.docs) {
-            messages.add(MessageModel.fromJson(element.data()));
-          }
-        });
+        print(element.data());
+        // await element.reference.collection('messages').get().then((value) {
+        //   for (var element in value.docs) {
+        //     messages.add(MessageModel.fromJson(element.data()));
+        //   }
+        // });
         privateChatUser.add(ChatUserModel.fromJson(element.data(), messages));
       }
-      print(privateChatUser.toString());
+      print(privateChatUser[0]);
       //intance of chatusermodel
       emit(GetAllUsersSuccessfully());
     });
   }
+
   List<MessageModel> messages = [];
   void getUsers() {
     final currentUserID = userModel!.id;
     FirebaseFirestore.instance.collection("users").get().then((value) {
+      allUsers = [];
       for (var element in value.docs) {
         final userId = element.id;
         if (userId != currentUserID) {
@@ -118,11 +114,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void getMyData() {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(userModel!.id)
-        .get()
-        .then((value) {
+    FirebaseFirestore.instance.collection('users').doc(userModel!.id).get().then((value) {
       userModel = UserModel.fromJson(value.data());
       emit(GetMYData());
     });
@@ -156,8 +148,7 @@ class HomeCubit extends Cubit<HomeState> {
                           Text(
                             ('Gallery'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.black),
+                            style: TextStyle(fontSize: 16, color: Colors.black),
                           )
                         ],
                       ),
@@ -183,10 +174,7 @@ class HomeCubit extends Cubit<HomeState> {
           .putFile(File(value!.path.toString()))
           .then((value) {
         value.ref.getDownloadURL().then((value) async {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userModel!.id)
-              .update({'image': value});
+          await FirebaseFirestore.instance.collection('users').doc(userModel!.id).update({'image': value});
           getMyData();
         });
       });

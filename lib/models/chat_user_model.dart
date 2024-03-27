@@ -9,6 +9,8 @@ class ChatUserModel {
   String? id;
 
   ChatUserModel.fromJson(Map<String, dynamic>? json, this.messages) {
+    print('fghjk');
+    print(json!['id']);
     id = json!['id'];
     name = json['name'];
     image = json['image'];

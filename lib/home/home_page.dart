@@ -42,6 +42,11 @@ class HomePage extends StatelessWidget {
                 dividerColor: Colors.transparent,
                 unselectedLabelColor: Colors.white,
                 labelColor: const Color(0XFF2E4374),
+                onTap: (v) {
+                  if (v == 0) {
+                    HomeCubit.get(context).getUsersChats();
+                  }
+                },
                 tabs: const [
                   Tab(text: 'Chats'),
                   Tab(text: 'Detect'),
@@ -57,9 +62,8 @@ class HomePage extends StatelessWidget {
                   child: Container(
                     decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(50),
-                            topRight: Radius.circular(50))),
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20.0,
@@ -76,17 +80,14 @@ class HomePage extends StatelessWidget {
                                 const Text(
                                   "Recent Chats",
                                   style: TextStyle(
-                                      color: Color(0XFF2E4374),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
+                                      color: Color(0XFF2E4374), fontWeight: FontWeight.bold, fontSize: 18),
                                 ),
                                 IconButton(
                                     onPressed: () {
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                const FindWidget(),
+                                            builder: (context) => const FindWidget(),
                                           ));
                                     },
                                     icon: const Icon(Icons.search_rounded))
@@ -99,12 +100,11 @@ class HomePage extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   return ListTile(
                                     onTap: () {
+                                      print('here:${cubit.privateChatUser[index].id}');
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => ChatScreen(
-                                              reciverName: cubit.privateChatUser[index].name,
-                                              reciverUserId: cubit.privateChatUser[index].id,
                                               userModel2: cubit.privateChatUser[index],
                                             ),
                                           ));
@@ -114,8 +114,7 @@ class HomePage extends StatelessWidget {
                                             elevation: 4,
                                             shape: CircleBorder(),
                                             child: CircleAvatar(
-                                              backgroundImage: AssetImage(
-                                                  'assets/images/profile.png'),
+                                              backgroundImage: AssetImage('assets/images/profile.png'),
                                             ),
                                           )
                                         : Material(
@@ -123,14 +122,13 @@ class HomePage extends StatelessWidget {
                                             shape: const CircleBorder(),
                                             child: CircleAvatar(
                                               backgroundColor: Colors.black,
-                                              backgroundImage: NetworkImage(cubit
-                                                  .privateChatUser[index].image!
-                                                  .toString()),
+                                              backgroundImage: NetworkImage(
+                                                  cubit.privateChatUser[index].image!.toString()),
                                             ),
                                           ),
                                     title: Text(cubit.privateChatUser[index].name!),
-                                    subtitle:  Text(cubit.privateChatUser[index].lastMessage.toString()),
-                                    trailing:  Text(cubit.privateChatUser[index].lastMessageDate.toString()),
+                                    subtitle: Text(cubit.privateChatUser[index].lastMessage.toString()),
+                                    trailing: Text(cubit.privateChatUser[index].lastMessageDate.toString()),
                                   );
                                 },
                               ),
@@ -146,9 +144,8 @@ class HomePage extends StatelessWidget {
                   child: Container(
                     decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(50),
-                            topRight: Radius.circular(50))),
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
@@ -185,9 +182,7 @@ class HomePage extends StatelessWidget {
                               Text(
                                 "This Audio Is Real",
                                 style: TextStyle(
-                                    color: Color(0xFF6E85B7),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
+                                    color: Color(0xFF6E85B7), fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               Icon(
                                 Icons.check,
@@ -205,9 +200,8 @@ class HomePage extends StatelessWidget {
                   child: Container(
                     decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(50),
-                            topRight: Radius.circular(50))),
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
@@ -222,8 +216,7 @@ class HomePage extends StatelessWidget {
                                       shape: CircleBorder(),
                                       child: CircleAvatar(
                                         radius: 60.0,
-                                        backgroundImage: AssetImage(
-                                            'assets/images/profile.png'),
+                                        backgroundImage: AssetImage('assets/images/profile.png'),
                                       ),
                                     )
                                   : Material(
@@ -231,8 +224,7 @@ class HomePage extends StatelessWidget {
                                       shape: const CircleBorder(),
                                       child: CircleAvatar(
                                         backgroundColor: Colors.black,
-                                        backgroundImage: NetworkImage(
-                                            userModel!.image.toString()),
+                                        backgroundImage: NetworkImage(userModel!.image.toString()),
                                         radius: 80,
                                       ),
                                     ),
@@ -261,9 +253,7 @@ class HomePage extends StatelessWidget {
                               Text(
                                 userModel!.name.toString(),
                                 style: const TextStyle(
-                                    color: Color(0XFF2E4374),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
+                                    color: Color(0XFF2E4374), fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(
                                 width: 5,
@@ -290,8 +280,7 @@ class HomePage extends StatelessWidget {
                                 ),
                                 ElevatedButton(
                                   style: const ButtonStyle(
-                                      backgroundColor: MaterialStatePropertyAll(
-                                          Color(0XFF2E4374))),
+                                      backgroundColor: MaterialStatePropertyAll(Color(0XFF2E4374))),
                                   onPressed: cubit.saveChanges,
                                   child: const Text(
                                     'Save',
@@ -309,9 +298,7 @@ class HomePage extends StatelessWidget {
                               Text(
                                 userModel!.phone.toString(),
                                 style: const TextStyle(
-                                    color: Color(0XFF2E4374),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold),
+                                    color: Color(0XFF2E4374), fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(
                                 width: 5,
@@ -338,8 +325,7 @@ class HomePage extends StatelessWidget {
                                 ),
                                 ElevatedButton(
                                   style: const ButtonStyle(
-                                      backgroundColor: MaterialStatePropertyAll(
-                                          Color(0XFF2E4374))),
+                                      backgroundColor: MaterialStatePropertyAll(Color(0XFF2E4374))),
                                   onPressed: cubit.saveChangesPhone,
                                   child: const Text(
                                     'Save',

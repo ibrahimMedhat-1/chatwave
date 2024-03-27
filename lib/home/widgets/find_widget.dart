@@ -10,6 +10,7 @@ class FindWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HomeCubit.get(context).getUsers();
     return BlocConsumer<HomeCubit, HomeState>(
       listener: (context, state) {
         // TODO: implement listener
@@ -34,9 +35,8 @@ class FindWidget extends StatelessWidget {
               child: Container(
                 decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50))),
+                    borderRadius:
+                        BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
                 child: Column(
                   children: [
                     SizedBox(
@@ -54,39 +54,33 @@ class FindWidget extends StatelessWidget {
                       child: ListView.builder(
                         itemCount: cubit.allUsers.length,
                         itemBuilder: (context, index) {
-                          return  ListTile(
-                            onTap: (){
+                          return ListTile(
+                            onTap: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ChatScreen(
-                                      reciverName: cubit.allUsers[index].name,
-                                      reciverUserId: cubit.allUsers[index].id,
                                       userModel2: cubit.allUsers[index],
                                     ),
                                   ));
                             },
                             leading: cubit.allUsers[index].image! == ''
                                 ? const Material(
-                              elevation: 4,
-                              shape: CircleBorder(),
-                              child: CircleAvatar(
-                                backgroundImage: AssetImage(
-                                    'assets/images/profile.png'),
-                              ),
-                            )
+                                    elevation: 4,
+                                    shape: CircleBorder(),
+                                    child: CircleAvatar(
+                                      backgroundImage: AssetImage('assets/images/profile.png'),
+                                    ),
+                                  )
                                 : Material(
-                              elevation: 4,
-                              shape: const CircleBorder(),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.black,
-                                backgroundImage: NetworkImage(cubit
-                                    .allUsers[index].image!
-                                    .toString()),
-                              ),
-                            ),
+                                    elevation: 4,
+                                    shape: const CircleBorder(),
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.black,
+                                      backgroundImage: NetworkImage(cubit.allUsers[index].image!.toString()),
+                                    ),
+                                  ),
                             title: Text(cubit.allUsers[index].name!),
-
                           );
                         },
                       ),
