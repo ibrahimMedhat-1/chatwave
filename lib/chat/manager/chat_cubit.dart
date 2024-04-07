@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chatwave/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/message_model.dart';
@@ -119,7 +121,7 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   String? url;
-
+  String result = 'none';
   Future stop({
     required receiverId,
     required secondUserName,
@@ -138,8 +140,14 @@ class ChatCubit extends Cubit<ChatState> {
         .then((p0) {
       p0.ref.getDownloadURL().then((value) async {
         url = value.toString();
+        String path = await saveVoice(url!, '${audioFile.path.split('/').last}.wav');
+        print(path);
+        File file = File(path);
+        // var response = await DioHelper.postData(url: baseUrl + uploadAudio, data: {'audio':file});
+        // result = response.data['result'];
         sendMessage(
           message: MessageModel(
+            result: result,
             date: DateTime.now().toString(),
             text: url.toString(),
             sender: secondUserName,
@@ -171,8 +179,83 @@ class ChatCubit extends Cubit<ChatState> {
   final audioPlayer = AudioPlayer();
   List<Duration> duration = [];
   List<Duration> position = [];
+
   changeIsPlaying(index) {
     isPlaying[index] = !isPlaying[index];
     emit(ChangeIsPlaying());
+  }
+
+  Future<String> saveVoice(String url, String fileName) async {
+    Directory? directory;
+    try {
+      if (Platform.isAndroid) {
+        await _requestPermission(Permission.storage);
+        if (true) {
+          print('here-----------------------here');
+          directory = await getExternalStorageDirectory();
+          String newPath = "";
+          List<String> paths = directory!.path.split("/");
+          for (int x = 1; x < paths.length; x++) {
+            String folder = paths[x];
+            if (folder != "Android") {
+              newPath += "/$folder";
+            } else {
+              break;
+            }
+          }
+          newPath = "$newPath/Download";
+          print(newPath);
+          print(directory.path);
+          directory = Directory(newPath);
+        } else {
+          return '';
+        }
+      } else {
+        if (await _requestPermission(Permission.photos)) {
+          directory = await getTemporaryDirectory();
+        } else {
+          return '';
+        }
+      }
+      File saveFile = File("${directory.path}/$fileName");
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      if (await directory.exists()) {
+        await Dio().download(url, saveFile.path, onReceiveProgress: (value1, value2) {
+          // setState(() {
+          //   progress = value1 / value2;
+          // });
+        }).then((value) {
+          // showToast('Downloaded Successfully');
+          print('-----------------------------------------');
+          print(saveFile.path);
+          print('-----------------------------------------');
+        }).catchError((onError) {
+          print('ghj');
+          print(onError);
+        });
+        if (Platform.isIOS) {
+          // await ImageGallerySaver.saveFile(saveFile.path, isReturnPathOfIOS: true);
+        }
+        return saveFile.path;
+      }
+      return '';
+    } catch (e) {
+      print(e);
+      return '';
+    }
+  }
+
+  Future<bool> _requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      }
+    }
+    return false;
   }
 }

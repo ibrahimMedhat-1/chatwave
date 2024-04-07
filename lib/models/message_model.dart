@@ -9,11 +9,13 @@ class MessageModel {
   String? sender;
   String? lastMessage;
   String? lastMessageDate;
+  String? result;
   String? image;
   bool? isRead;
   bool? isLastMessage;
   MessageModel({
     required this.date,
+    required this.result,
     required this.text,
     required this.sender,
     required this.receiverId,
@@ -28,6 +30,7 @@ class MessageModel {
   MessageModel.fromJson(Map<String, dynamic>? json) {
     date = json!['date'];
     receiverId = json['id'];
+    result = json['result'];
     image = json['image'];
     lastMessage = json['lastMessage'];
     lastMessageDate = json['lastMessageDate'];
@@ -44,6 +47,7 @@ class MessageModel {
   Map<String, dynamic> toMap() => {
         'date': date,
         'image': image,
+        'result': result,
         'lastMessage': lastMessage,
         'lastMessageDate': lastMessageDate,
         'id': receiverId,

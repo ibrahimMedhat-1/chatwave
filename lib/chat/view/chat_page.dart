@@ -148,6 +148,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                                         mainAxisAlignment: MainAxisAlignment.end,
                                                         children: [
                                                           Text(
+                                                            '${message.result.toString()} - ${intl.DateFormat.jm().format(DateTime.parse(message.date.toString()))}',
+                                                            style: Theme.of(context).textTheme.bodySmall,
+                                                          ),
+                                                          Text(
                                                             '${intl.DateFormat.yMd().format(DateTime.parse(message.date.toString()))} - ${intl.DateFormat.jm().format(DateTime.parse(message.date.toString()))}',
                                                             style: Theme.of(context).textTheme.bodySmall,
                                                           ),
@@ -242,6 +246,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                                         mainAxisAlignment: MainAxisAlignment.end,
                                                         children: [
                                                           Text(
+                                                            '${message.result.toString()} - ${intl.DateFormat.jm().format(DateTime.parse(message.date.toString()))}',
+                                                            style: Theme.of(context).textTheme.bodySmall,
+                                                          ),
+                                                          Text(
                                                             '${intl.DateFormat.yMd().format(DateTime.parse(message.date.toString()))} - ${intl.DateFormat.jm().format(DateTime.parse(message.date.toString()))}',
                                                             style: Theme.of(context).textTheme.bodySmall,
                                                           ),
@@ -275,6 +283,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     print(userModel!.id);
                                     print(widget.userModel2.id);
                                     MessageModel message = MessageModel(
+                                      result: 'none',
                                       date: DateTime.now().toString(),
                                       text: cubit.messageController.text,
                                       sender: widget.userModel2.name,

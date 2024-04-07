@@ -13,6 +13,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    HomeCubit.get(context).getUsersChats();
     return DefaultTabController(
       length: 3,
       child: BlocConsumer<HomeCubit, HomeState>(
@@ -169,25 +170,26 @@ class HomePage extends StatelessWidget {
                           const SizedBox(
                             height: 25,
                           ),
-                          const Text(
-                            "Uploaded Audio",
+                          Text(
+                            cubit.fileName,
                             style: TextStyle(fontSize: 16),
                           ),
                           const SizedBox(
                             height: 25,
                           ),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "This Audio Is Real",
+                                cubit.result,
                                 style: TextStyle(
                                     color: Color(0xFF6E85B7), fontSize: 20, fontWeight: FontWeight.bold),
                               ),
-                              Icon(
-                                Icons.check,
-                                color: Colors.green,
-                              )
+                              if (cubit.result.isNotEmpty)
+                                Icon(
+                                  cubit.result == 'real' ? Icons.check : Icons.cancel,
+                                  color: cubit.result == 'real' ? Colors.green : Colors.red,
+                                )
                             ],
                           ),
                         ],

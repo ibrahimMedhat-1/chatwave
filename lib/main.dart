@@ -17,9 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => HomeCubit()
-        ..getUsers()
-        ..getUsersChats(),
+      create: (context) => HomeCubit()..getUsers(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',

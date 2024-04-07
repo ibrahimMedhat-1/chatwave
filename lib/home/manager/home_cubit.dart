@@ -92,13 +92,14 @@ class HomeCubit extends Cubit<HomeState> {
         // });
         privateChatUser.add(ChatUserModel.fromJson(element.data(), messages));
       }
-      print(privateChatUser[0]);
+      print(privateChatUser);
       //intance of chatusermodel
       emit(GetAllUsersSuccessfully());
     });
   }
 
   List<MessageModel> messages = [];
+
   void getUsers() {
     final currentUserID = userModel!.id;
     FirebaseFirestore.instance.collection("users").get().then((value) {
@@ -182,6 +183,9 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
+  String fileName = '';
+  String result = '';
+
   Future<void> pickAndUploadAudio() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.audio,
@@ -189,14 +193,21 @@ class HomeCubit extends Cubit<HomeState> {
     );
     if (result != null) {
       File file = File(result.files.single.path!);
-      String fileName = result.files.single.name;
+      fileName = result.files.single.name;
+      emit(ChangeFile());
+
       Reference ref = FirebaseStorage.instance.ref().child('audio/$fileName');
       UploadTask task = ref.putFile(file);
       await task.whenComplete(() async {
         String downloadURL = await ref.getDownloadURL();
+        // var response = await DioHelper.postData(url: baseUrl + uploadAudio, data: {'audio':file});
+        // result = response.data['result'];
         await FirebaseFirestore.instance.collection('audio').add({
           'name': fileName,
           'url': downloadURL,
+          // 'state': response.data['result'],
+        }).then((value) async {
+          emit(ChangeFile());
         });
       });
     }
