@@ -5,15 +5,19 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:chatwave/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/message_model.dart';
+import '../../shared/network/remote/end_points.dart';
 
 part 'chat_state.dart';
 
@@ -122,6 +126,7 @@ class ChatCubit extends Cubit<ChatState> {
 
   String? url;
   String result = 'none';
+
   Future stop({
     required receiverId,
     required secondUserName,
@@ -140,11 +145,49 @@ class ChatCubit extends Cubit<ChatState> {
         .then((p0) {
       p0.ref.getDownloadURL().then((value) async {
         url = value.toString();
-        String path = await saveVoice(url!, '${audioFile.path.split('/').last}.wav');
-        print(path);
+        print(url);
+        String path =
+            await saveVoice(url!, '${url.toString().split('/').last.split('=').last.split('-').last}.mp3');
         File file = File(path);
-        // var response = await DioHelper.postData(url: baseUrl + uploadAudio, data: {'audio':file});
+        print(path);
+
+        /// /data/user/0/com.example.chatwave/cache/file_picker/1712898450370/audio.mp3
+        await FFmpegKit.execute('-i $path $path.wav').then((session) async {
+          final returnCode = await session.getReturnCode();
+          // print(session.get.toString());
+
+          if (ReturnCode.isSuccess(returnCode)) {
+            // SUCCESS
+            print(returnCode.toString());
+            file = File('$path.wav');
+            print('done');
+          } else if (ReturnCode.isCancel(returnCode)) {
+            print('cancel');
+            // CANCEL
+          } else {
+            print(await session.getOutput());
+            print('errorgfg');
+            // ERROR
+          }
+        });
+        var request = http.MultipartRequest('POST', Uri.parse(baseUrl));
+        request.fields['audio'] = 'audio';
+        var audio = http.MultipartFile.fromBytes('audio', await file.readAsBytes(), filename: 'audio.wav');
+        request.files.add(audio);
+        var response = await request.send();
+        var responseData = await response.stream.toBytes();
+
+        result = String.fromCharCodes(responseData);
+        result = result.split('result').last.split('"').getRange(2, 3).last;
+
+        // var response = await DioHelper.postData(
+        //   url: baseUrl,
+        //   data: FormData.fromMap({
+        //     'audio': audio,
+        //   }),
+        // );
         // result = response.data['result'];
+        print(result);
         sendMessage(
           message: MessageModel(
             result: result,
@@ -160,7 +203,7 @@ class ChatCubit extends Cubit<ChatState> {
             duration: printDuration(recordDuration),
           ),
         );
-        debugPrint('done');
+        // debugPrint('done');
       });
     }).catchError((onError) {
       debugPrint('audio error');
@@ -189,9 +232,11 @@ class ChatCubit extends Cubit<ChatState> {
     Directory? directory;
     try {
       if (Platform.isAndroid) {
+        print('here-----------------------here');
+        await _requestPermission(Permission.storage);
+        await _requestPermission(Permission.photos);
         await _requestPermission(Permission.storage);
         if (true) {
-          print('here-----------------------here');
           directory = await getExternalStorageDirectory();
           String newPath = "";
           List<String> paths = directory!.path.split("/");
@@ -247,15 +292,44 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  void checkFileSystemPermission() async {
+    PermissionStatus status = await Permission.storage.status;
+    await _requestPermission(Permission.storage);
+    await _requestPermission(Permission.photos);
+    if (status.isGranted) {
+      print('File system permission granted!');
+      // Access to the file system is granted. Proceed with file operations.
+    } else {
+      print('File system permission not granted. Requesting permission...');
+      // Request permission from the user.
+      status = await Permission.photos.request();
+      await Permission.storage.request();
+      await Permission.accessMediaLocation.request();
+      await Permission.manageExternalStorage.request();
+      if (status.isGranted) {
+        print('File system permission granted!');
+        // Access to the file system is granted. Proceed with file operations.
+      } else {
+        print('File system permission denied!');
+        // Access to the file system is denied. Handle accordingly.
+      }
+    }
+  }
+
   Future<bool> _requestPermission(Permission permission) async {
+    print('1');
     if (await permission.isGranted) {
+      print('2');
       return true;
     } else {
+      print('3');
       var result = await permission.request();
       if (result == PermissionStatus.granted) {
+        print('4');
         return true;
       }
     }
+    print('5');
     return false;
   }
 }

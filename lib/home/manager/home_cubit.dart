@@ -1,16 +1,20 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 import '../../constants.dart';
 import '../../models/chat_user_model.dart';
 import '../../models/message_model.dart';
 import '../../models/user_model.dart';
+import '../../shared/network/remote/end_points.dart';
 
 part 'home_state.dart';
 
@@ -184,7 +188,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   String fileName = '';
-  String result = '';
+  String stringResult = '';
 
   Future<void> pickAndUploadAudio() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -194,22 +198,48 @@ class HomeCubit extends Cubit<HomeState> {
     if (result != null) {
       File file = File(result.files.single.path!);
       fileName = result.files.single.name;
-      emit(ChangeFile());
+      path = file.path;
+      print(path);
+      // String path = await ChatCubit().saveVoice(file.path, '${file.path.split('/').last}.mp3');
+      await FFmpegKit.execute('-i $path $path.wav').then((session) async {
+        final returnCode = await session.getReturnCode();
 
-      Reference ref = FirebaseStorage.instance.ref().child('audio/$fileName');
-      UploadTask task = ref.putFile(file);
-      await task.whenComplete(() async {
-        String downloadURL = await ref.getDownloadURL();
-        // var response = await DioHelper.postData(url: baseUrl + uploadAudio, data: {'audio':file});
-        // result = response.data['result'];
-        await FirebaseFirestore.instance.collection('audio').add({
-          'name': fileName,
-          'url': downloadURL,
-          // 'state': response.data['result'],
-        }).then((value) async {
-          emit(ChangeFile());
-        });
+        if (ReturnCode.isSuccess(returnCode)) {
+          // SUCCESS
+          file = File('$path.wav');
+          print('done');
+        } else if (ReturnCode.isCancel(returnCode)) {
+          print('cancel');
+          // CANCEL
+        } else {
+          print('error');
+          print(returnCode.toString());
+          // ERROR
+        }
       });
+
+      var request = await http.MultipartRequest('POST', Uri.parse(baseUrl));
+      request.fields['audio'] = 'audio';
+      var audio = await http.MultipartFile.fromBytes(
+        'audio',
+        (await file.readAsBytes()).buffer.asUint8List(),
+        filename: 'audio.wav',
+      );
+      request.files.add(audio);
+      var response = await request.send();
+      var responseData = await response.stream.toBytes();
+
+      stringResult = String.fromCharCodes(responseData);
+      // var response = await DioHelper.postData(
+      //   url: baseUrl,
+      //   data: FormData.fromMap({
+      //     'audio': audio,
+      //   }),
+      // );
+      // result = response.data['result'];
+      stringResult = stringResult.split('result').last.split('"').getRange(2, 3).last;
+      print(stringResult);
+      emit(ChangeFile());
     }
   }
 }

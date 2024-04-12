@@ -1,3 +1,4 @@
+import 'package:chatwave/auth/login.dart';
 import 'package:chatwave/constants.dart';
 import 'package:chatwave/home/manager/home_cubit.dart';
 import 'package:chatwave/home/widgets/find_widget.dart';
@@ -181,14 +182,14 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                cubit.result,
+                                cubit.stringResult,
                                 style: TextStyle(
                                     color: Color(0xFF6E85B7), fontSize: 20, fontWeight: FontWeight.bold),
                               ),
-                              if (cubit.result.isNotEmpty)
+                              if (cubit.stringResult.isNotEmpty)
                                 Icon(
-                                  cubit.result == 'real' ? Icons.check : Icons.cancel,
-                                  color: cubit.result == 'real' ? Colors.green : Colors.red,
+                                  cubit.stringResult == 'real' ? Icons.check : Icons.cancel,
+                                  color: cubit.stringResult == 'real' ? Colors.green : Colors.red,
                                 )
                             ],
                           ),
@@ -340,7 +341,14 @@ class HomePage extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.06,
                           ),
                           PrimaryButton(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginPage(),
+                                  ),
+                                  (route) => false);
+                            },
                             bgColor: const Color(0XFF2E4374),
                             text: "Logout",
                             textColor: Colors.white,
