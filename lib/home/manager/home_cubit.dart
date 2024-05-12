@@ -25,6 +25,7 @@ class HomeCubit extends Cubit<HomeState> {
   bool isEditing = false;
   bool isEditingPhone = false;
   List<ChatUserModel> users = [];
+  List<ChatUserModel> searchUsersList = [];
 
   List<ChatUserModel> allUsers = [];
   TextEditingController nameController = TextEditingController();
@@ -114,6 +115,7 @@ class HomeCubit extends Cubit<HomeState> {
           allUsers.add(ChatUserModel.fromJson(element.data(), messages));
         }
       }
+      users = allUsers;
       emit(GetUsers());
     });
   }
@@ -241,5 +243,23 @@ class HomeCubit extends Cubit<HomeState> {
       print(stringResult);
       emit(ChangeFile());
     }
+  }
+
+  void isNotSearching() {
+    users = allUsers;
+    emit(IsNotSearching());
+  }
+
+  void searchUsers(String value) {
+    searchUsersList.clear();
+    print(value);
+    for (ChatUserModel user in allUsers) {
+      if (user.name.toString().toLowerCase().startsWith(value.toLowerCase())) {
+        searchUsersList.add(user);
+      }
+    }
+    print(searchUsersList);
+    users = searchUsersList;
+    emit(IsSearching());
   }
 }

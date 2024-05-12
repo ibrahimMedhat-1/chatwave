@@ -17,4 +17,8 @@ class ChangeImage extends HomeState {}
 
 class ChangeFile extends HomeState {}
 
+class IsSearching extends HomeState {}
+
+class IsNotSearching extends HomeState {}
+
 class GetAllUsersSuccessfully extends HomeState {}

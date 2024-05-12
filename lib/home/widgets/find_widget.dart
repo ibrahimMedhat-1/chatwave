@@ -29,64 +29,68 @@ class FindWidget extends StatelessWidget {
             centerTitle: true,
           ),
           backgroundColor: const Color(0XFF2E4374),
-          body: Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                    ),
-                    CutomTextField(
-                      hintText: "Search",
-                      prefixIcon: const Icon(Icons.search),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      child: ListView.builder(
-                        itemCount: cubit.allUsers.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatScreen(
-                                      userModel2: cubit.allUsers[index],
-                                    ),
-                                  ));
-                            },
-                            leading: cubit.allUsers[index].image! == ''
-                                ? const Material(
-                                    elevation: 4,
-                                    shape: CircleBorder(),
-                                    child: CircleAvatar(
-                                      backgroundImage: AssetImage('assets/images/profile.png'),
-                                    ),
-                                  )
-                                : Material(
-                                    elevation: 4,
-                                    shape: const CircleBorder(),
-                                    child: CircleAvatar(
-                                      backgroundColor: Colors.black,
-                                      backgroundImage: NetworkImage(cubit.allUsers[index].image!.toString()),
-                                    ),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.only(topLeft: Radius.circular(50), topRight: Radius.circular(50))),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.04,
+                  ),
+                  CutomTextField(
+                    onChanged: (value) {
+                      if (value == null || value.isEmpty) {
+                        cubit.isNotSearching();
+                      } else {
+                        cubit.searchUsers(value);
+                      }
+                    },
+                    hintText: "Search",
+                    prefixIcon: const Icon(Icons.search),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: cubit.users.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatScreen(
+                                    userModel2: cubit.users[index],
                                   ),
-                            title: Text(cubit.allUsers[index].name!),
-                          );
-                        },
-                      ),
-                    )
-                  ],
-                ),
+                                ));
+                          },
+                          leading: cubit.users[index].image! == ''
+                              ? const Material(
+                                  elevation: 4,
+                                  shape: CircleBorder(),
+                                  child: CircleAvatar(
+                                    backgroundImage: AssetImage('assets/images/profile.png'),
+                                  ),
+                                )
+                              : Material(
+                                  elevation: 4,
+                                  shape: const CircleBorder(),
+                                  child: CircleAvatar(
+                                    backgroundColor: Colors.black,
+                                    backgroundImage: NetworkImage(cubit.users[index].image!.toString()),
+                                  ),
+                                ),
+                          title: Text(cubit.users[index].name!),
+                        );
+                      },
+                    ),
+                  )
+                ],
               ),
             ),
           ),
